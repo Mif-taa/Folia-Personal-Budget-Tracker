@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Folia — Personal Budget Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-icon">◈</span>
+      <span class="logo-text">Folia</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-page="dashboard">
+        <span class="nav-icon">⬡</span><span>Dashboard</span>
+      </a>
+      <a href="#" class="nav-item" data-page="transactions">
+        <span class="nav-icon">⇄</span><span>Transactions</span>
+      </a>
+      <a href="#" class="nav-item" data-page="budgets">
+        <span class="nav-icon">◎</span><span>Budgets</span>
+      </a>
+      <a href="#" class="nav-item" data-page="analytics">
+        <span class="nav-icon">◈</span><span>Analytics</span>
+      </a>
+      <a href="#" class="nav-item" data-page="savings">
+        <span class="nav-icon">◇</span><span>Savings Goals</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+        <span class="theme-icon">◐</span>
+      </button>
+      <button class="export-btn" id="exportBtn" title="Export CSV">
+        <span>↓</span> Export
+      </button>
+    </div>
+  </aside>
+
+  <!-- Mobile nav toggle -->
+  <button class="mobile-menu-btn" id="mobileMenu">☰</button>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Main content -->
+  <main class="main-content">
+
+    <!-- DASHBOARD PAGE -->
+    <section class="page active" id="page-dashboard">
+      <header class="page-header">
+        <div>
+          <p class="page-subtitle">Good to see you</p>
+          <h1 class="page-title">Overview</h1>
+        </div>
+        <div class="header-actions">
+          <span class="current-month" id="currentMonthLabel"></span>
+          <button class="btn-primary" id="dashAddTxBtn">+ New Transaction</button>
+        </div>
+      </header>
+
+      <!-- Summary Cards -->
+      <div class="cards-grid">
+        <div class="card card-balance">
+          <div class="card-label">Total Balance</div>
+          <div class="card-value" id="totalBalance">৳0.00</div>
+          <div class="card-trend" id="balanceTrend"></div>
+        </div>
+        <div class="card card-income">
+          <div class="card-label">Total Income</div>
+          <div class="card-value" id="totalIncome">৳0.00</div>
+          <div class="card-sub" id="incomeCount">0 transactions</div>
+        </div>
+        <div class="card card-expense">
+          <div class="card-label">Total Expenses</div>
+          <div class="card-value" id="totalExpenses">৳0.00</div>
+          <div class="card-sub" id="expenseCount">0 transactions</div>
+        </div>
+        <div class="card card-savings">
+          <div class="card-label">Savings Rate</div>
+          <div class="card-value" id="savingsRate">0%</div>
+          <div class="card-sub">of income saved</div>
+        </div>
+      </div>
+
+      <!-- Charts + Recent -->
+      <div class="dashboard-grid">
+        <div class="panel panel-chart">
+          <div class="panel-header">
+            <h3>Monthly Trend</h3>
+            <div class="chart-legend">
+              <span class="legend-dot income"></span>Income
+              <span class="legend-dot expense"></span>Expense
+            </div>
+          </div>
+          <canvas id="trendChart" height="120"></canvas>
+        </div>
+        <div class="panel panel-donut">
+          <div class="panel-header"><h3>Expense Breakdown</h3></div>
+          <canvas id="donutChart" height="120"></canvas>
+          <div class="donut-legend" id="donutLegend"></div>
+        </div>
+      </div>
+
+      <!-- Recent Transactions -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Recent Transactions</h3>
+          <a href="#" class="panel-link" data-page="transactions">View all →</a>
+        </div>
+        <div class="tx-list" id="recentTransactions">
+          <div class="empty-state">No transactions yet. Add one to get started.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRANSACTIONS PAGE -->
+    <section class="page" id="page-transactions">
+      <header class="page-header">
+        <div>
+          <p class="page-subtitle">All activity</p>
+          <h1 class="page-title">Transactions</h1>
+        </div>
+        <button class="btn-primary" id="txAddBtn">+ New Transaction</button>
+      </header>
+
+      <!-- Filters -->
+      <div class="filters-bar">
+        <input type="text" class="filter-input" id="searchInput" placeholder="Search transactions…" />
+        <select class="filter-select" id="filterCategory">
+          <option value="">All Categories</option>
+        </select>
+        <select class="filter-select" id="filterType">
+          <option value="">All Types</option>
+          <option value="income">Income</option>
+          <option value="expense">Expense</option>
+        </select>
+        <input type="month" class="filter-input" id="filterMonth" />
+        <button class="btn-ghost" id="clearFilters">Clear</button>
+      </div>
+
+      <div class="tx-list full" id="allTransactions">
+        <div class="empty-state">No transactions yet.</div>
+      </div>
+    </section>
+
+    <!-- BUDGETS PAGE -->
+    <section class="page" id="page-budgets">
+      <header class="page-header">
+        <div>
+          <p class="page-subtitle">Stay on track</p>
+          <h1 class="page-title">Monthly Budgets</h1>
+        </div>
+        <button class="btn-primary" id="addBudgetBtn">+ Set Budget</button>
+      </header>
+      <div class="budgets-grid" id="budgetsGrid">
+        <div class="empty-state">No budgets set. Click "+ Set Budget" to begin.</div>
+      </div>
+    </section>
+
+    <!-- ANALYTICS PAGE -->
+    <section class="page" id="page-analytics">
+      <header class="page-header">
+        <div>
+          <p class="page-subtitle">Deeper insights</p>
+          <h1 class="page-title">Analytics</h1>
+        </div>
+        <select class="filter-select" id="analyticsYear" style="width:auto"></select>
+      </header>
+      <div class="analytics-grid">
+        <div class="panel">
+          <div class="panel-header"><h3>Income vs Expense (Year)</h3></div>
+          <canvas id="barChart" height="120"></canvas>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><h3>Category Spending</h3></div>
+          <canvas id="categoryBar" height="120"></canvas>
+        </div>
+        <div class="panel panel-wide">
+          <div class="panel-header"><h3>Running Balance</h3></div>
+          <canvas id="runningBalance" height="80"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- SAVINGS PAGE -->
+    <section class="page" id="page-savings">
+      <header class="page-header">
+        <div>
+          <p class="page-subtitle">Build your future</p>
+          <h1 class="page-title">Savings Goals</h1>
+        </div>
+        <button class="btn-primary" id="addGoalBtn">+ New Goal</button>
+      </header>
+      <div class="goals-grid" id="goalsGrid">
+        <div class="empty-state">No savings goals yet. Create one to start tracking!</div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================== MODALS ===================== -->
+
+  <!-- Transaction Modal -->
+  <div class="modal-overlay" id="txModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="txModalTitle">New Transaction</h2>
+        <button class="modal-close" data-modal="txModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Type</label>
+            <div class="type-toggle">
+              <button class="type-btn active" data-type="expense">Expense</button>
+              <button class="type-btn" data-type="income">Income</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="txTitle" placeholder="e.g. Grocery shopping" />
+          </div>
+          <div class="form-group">
+            <label>Amount (৳)</label>
+            <input type="number" id="txAmount" placeholder="0.00" min="0" step="0.01" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category</label>
+            <select id="txCategory"></select>
+          </div>
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="txDate" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Note (optional)</label>
+          <input type="text" id="txNote" placeholder="Any additional details…" />
+        </div>
+        <div class="form-group recurring-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="txRecurring" />
+            <span>Recurring monthly</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" data-modal="txModal">Cancel</button>
+        <button class="btn-primary" id="saveTxBtn">Save Transaction</button>
+      </div>
+      <input type="hidden" id="txEditId" />
+    </div>
+  </div>
+
+  <!-- Budget Modal -->
+  <div class="modal-overlay" id="budgetModal">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h2>Set Budget</h2>
+        <button class="modal-close" data-modal="budgetModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Category</label>
+          <select id="budgetCategory"></select>
+        </div>
+        <div class="form-group">
+          <label>Monthly Limit (৳)</label>
+          <input type="number" id="budgetAmount" placeholder="0.00" min="0" step="0.01" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" data-modal="budgetModal">Cancel</button>
+        <button class="btn-primary" id="saveBudgetBtn">Save Budget</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Savings Goal Modal -->
+  <div class="modal-overlay" id="goalModal">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h2 id="goalModalTitle">New Savings Goal</h2>
+        <button class="modal-close" data-modal="goalModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Goal Name</label>
+          <input type="text" id="goalName" placeholder="e.g. Emergency Fund" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Target Amount (৳)</label>
+            <input type="number" id="goalTarget" placeholder="0.00" min="0" step="0.01" />
+          </div>
+          <div class="form-group">
+            <label>Saved So Far (৳)</label>
+            <input type="number" id="goalSaved" placeholder="0.00" min="0" step="0.01" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Target Date</label>
+          <input type="date" id="goalDate" />
+        </div>
+        <div class="form-group">
+          <label>Emoji</label>
+          <input type="text" id="goalEmoji" placeholder="🎯" maxlength="2" style="width:60px;text-align:center;font-size:1.5rem" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" data-modal="goalModal">Cancel</button>
+        <button class="btn-primary" id="saveGoalBtn">Save Goal</button>
+      </div>
+      <input type="hidden" id="goalEditId" />
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
