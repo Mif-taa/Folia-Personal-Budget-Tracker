@@ -6,6 +6,8 @@ A modern, elegant personal finance management application built with vanilla Jav
 ![Folia Analytics](screenshots/analytics.png)
 ![Folia Transactions](screenshots/transactions.png)
 ![Folia Budgets](screenshots/budgets.png)
+![Folia New Savings Goal](screenshots/new_savings_goal.png)
+![Folia New Transaction](screenshots/new_transaction.png)
 
 ## ✨ Features
 
