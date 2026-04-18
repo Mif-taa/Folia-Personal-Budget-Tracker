@@ -8,6 +8,8 @@ A modern, elegant personal finance management application built with vanilla Jav
 ![Folia Budgets](screenshots/budgets.png)
 ![Folia New Savings Goal](screenshots/new_savings_goal.png)
 ![Folia New Transaction](screenshots/new_transaction.png)
+![Folia Savings Goals](screenshots/savings_goals.png)
+![Folia Set Budget](screenshots/set_budget.png)
 
 ## ✨ Features
 
