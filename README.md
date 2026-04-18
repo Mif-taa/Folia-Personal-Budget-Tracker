@@ -2,7 +2,10 @@
 
 A modern, elegant personal finance management application built with vanilla JavaScript, HTML5 and CSS3. Track your income, expenses, set budgets and visualize your financial data with beautiful charts.
 
-![Folia Preview](https://via.placeholder.com/800x400/0d1117/ffffff?text=Folia+Budget+Tracker+Preview)
+![Folia Dashboard](screenshots/dashboard.png)
+![Folia Analytics](screenshots/analytics.png)
+![Folia Transactions](screenshots/transactions.png)
+![Folia Budgets](screenshots/budgets.png)
 
 ## ✨ Features
 
